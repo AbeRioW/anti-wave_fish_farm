@@ -1,0 +1,26 @@
+--cpu Cortex-M3
+"anti-wave_fish_farm\startup_stm32f103xb.o"
+"anti-wave_fish_farm\main.o"
+"anti-wave_fish_farm\gpio.o"
+"anti-wave_fish_farm\i2c.o"
+"anti-wave_fish_farm\stm32f1xx_it.o"
+"anti-wave_fish_farm\stm32f1xx_hal_msp.o"
+"anti-wave_fish_farm\stm32f1xx_hal_gpio_ex.o"
+"anti-wave_fish_farm\stm32f1xx_hal_i2c.o"
+"anti-wave_fish_farm\stm32f1xx_hal.o"
+"anti-wave_fish_farm\stm32f1xx_hal_rcc.o"
+"anti-wave_fish_farm\stm32f1xx_hal_rcc_ex.o"
+"anti-wave_fish_farm\stm32f1xx_hal_gpio.o"
+"anti-wave_fish_farm\stm32f1xx_hal_dma.o"
+"anti-wave_fish_farm\stm32f1xx_hal_cortex.o"
+"anti-wave_fish_farm\stm32f1xx_hal_pwr.o"
+"anti-wave_fish_farm\stm32f1xx_hal_flash.o"
+"anti-wave_fish_farm\stm32f1xx_hal_flash_ex.o"
+"anti-wave_fish_farm\stm32f1xx_hal_exti.o"
+"anti-wave_fish_farm\system_stm32f1xx.o"
+"anti-wave_fish_farm\oled.o"
+"anti-wave_fish_farm\bh1750.o"
+--strict --scatter "anti-wave_fish_farm\anti-wave_fish_farm.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "anti-wave_fish_farm.map" -o anti-wave_fish_farm\anti-wave_fish_farm.axf
