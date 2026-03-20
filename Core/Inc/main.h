@@ -67,6 +67,8 @@ void Error_Handler(void);
 #define OLED_SDA_GPIO_Port GPIOA
 #define OLED_SCL_Pin GPIO_PIN_0
 #define OLED_SCL_GPIO_Port GPIOB
+#define HC_SR04_Trig_Pin GPIO_PIN_8
+#define HC_SR04_Trig_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

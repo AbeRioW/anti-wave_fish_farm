@@ -26,7 +26,10 @@ anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_fl
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
+anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
+anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 anti-wave_fish_farm\main.o: ../Core/Inc/i2c.h
+anti-wave_fish_farm\main.o: ../Core/Inc/tim.h
 anti-wave_fish_farm\main.o: ../Core/Inc/gpio.h
 anti-wave_fish_farm\main.o: ../APP/oled.h
 anti-wave_fish_farm\main.o: ../APP/BH1750.h

@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -57,6 +58,71 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// 微秒延时函数
+void delay_us(uint32_t us)
+{
+    uint32_t delay = (HAL_RCC_GetHCLKFreq()/4000000*us);
+    while(delay--);
+}
+
+// HC-SR04超声波测距函数（使用GPIO轮询 + 简单计数）
+float HCSR04_MeasureDistance(void)
+{
+    uint32_t start_time = 0;
+    uint32_t end_time = 0;
+    uint32_t pulse_width = 0;
+    float distance = 0.0f;
+    
+    // 发送10us的触发脉冲
+    HAL_GPIO_WritePin(HC_SR04_Trig_GPIO_Port, HC_SR04_Trig_Pin, GPIO_PIN_SET);
+    delay_us(10);
+    HAL_GPIO_WritePin(HC_SR04_Trig_GPIO_Port, HC_SR04_Trig_Pin, GPIO_PIN_RESET);
+    
+    // 等待Echo信号上升沿
+    uint32_t timeout = 0;
+    while (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3) == GPIO_PIN_RESET) { // Echo连接到PB3
+        timeout++;
+        if (timeout > 1000000) { // 超时保护
+            return -1.0f;
+        }
+    }
+    
+    // 记录起始时间（使用TIM2计数器）
+    __HAL_TIM_SetCounter(&htim2, 0);
+    HAL_TIM_Base_Start(&htim2);
+    
+    // 等待Echo信号下降沿
+    timeout = 0;
+    while (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3) == GPIO_PIN_SET) { // Echo连接到PB3
+        timeout++;
+        if (timeout > 10000000) { // 超时保护
+            HAL_TIM_Base_Stop(&htim2);
+            return -1.0f;
+        }
+    }
+    
+    // 记录结束时间（使用TIM2计数器）
+    pulse_width = __HAL_TIM_GetCounter(&htim2);
+    HAL_TIM_Base_Stop(&htim2);
+    
+    // 计算距离：距离(cm) = 脉冲宽度(us) * 0.0343 / 2
+    // TIM2的时钟频率是72MHz / 72 = 1MHz，所以1个计数单位 = 1us
+    distance = (float)pulse_width * 0.0343f / 2.0f;
+    
+    // 限制距离范围（2cm-400cm）
+    if (distance < 2.0f || distance > 400.0f) {
+        return -1.0f;
+    }
+    
+    return distance;
+}
+
+// 初始化测量状态
+void HCSR04_Init(void)
+{
+    // 无需特殊初始化
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -89,19 +155,38 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   OLED_Init();
   BH1750_Init();
+  HCSR04_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    // 读取光照数据
     float light_value = BH1750_ReadLight();
+    
+    // 读取超声波距离
+    float distance = HCSR04_MeasureDistance();
+    
+    // 显示数据
     OLED_Clear();
     OLED_ShowString(0,0,(uint8_t*)"Lux:",8,1);
     oled_showFnum(30,0,light_value,8,1);
+    
+    OLED_ShowString(0,20,(uint8_t*)"Distance:",8,1);
+    if (distance >= 0) {
+        // 四舍五入到小数点后1位
+        float rounded_distance = (float)((int)(distance * 10 + 0.5)) / 10;
+        oled_showFnum(60,20,rounded_distance,8,1);
+        OLED_ShowString(100,20,(uint8_t*)"cm",8,1);
+    } else {
+        OLED_ShowString(60,20,(uint8_t*)"Error",8,1);
+    }
+    
     OLED_Refresh();
     HAL_Delay(500);
     /* USER CODE END WHILE */

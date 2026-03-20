@@ -28,6 +28,8 @@ anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_fl
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
+anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
+anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 anti-wave_fish_farm\oled.o: D:\Program Files\KEIL5\ARM\ARMCC\Bin\..\include\stdlib.h
 anti-wave_fish_farm\oled.o: ..\APP\oledfont.h
 anti-wave_fish_farm\oled.o: D:\Program Files\KEIL5\ARM\ARMCC\Bin\..\include\stdio.h
