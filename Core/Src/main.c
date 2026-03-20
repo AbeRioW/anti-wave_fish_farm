@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "i2c.h"
 #include "tim.h"
 #include "gpio.h"
@@ -273,6 +274,21 @@ void DS18B20_Init(void)
     DS18B20_Reset();
 }
 
+// 读取AZDM01混度传感器值
+float AZDM01_ReadHumidity(void)
+{
+    float humidity = 0.0f;
+    HAL_ADC_Start(&hadc1);
+    if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) {
+        uint16_t adc_value = HAL_ADC_GetValue(&hadc1);
+        // 根据AZDM01传感器的特性转换为湿度值
+        // 假设传感器输出范围为0-3.3V，对应0-100%RH
+        humidity = (float)adc_value / 4095.0f * 100.0f;
+    }
+    HAL_ADC_Stop(&hadc1);
+    return humidity;
+}
+
 // HC-SR04超声波测距函数（使用GPIO轮询 + 简单计数）
 float HCSR04_MeasureDistance(void)
 {
@@ -364,6 +380,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_TIM2_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   OLED_Init();
   BH1750_Init();
@@ -384,30 +401,39 @@ int main(void)
     // 读取温度数据
     float temperature = DS18B20_ReadTemperature();
     
+    // 读取混度数据
+    float humidity = AZDM01_ReadHumidity();
+    
     // 显示数据
     OLED_Clear();
     OLED_ShowString(0,0,(uint8_t*)"Lux:",8,1);
     oled_showFnum(30,0,light_value,8,1);
     
-    OLED_ShowString(0,20,(uint8_t*)"Distance:",8,1);
+    OLED_ShowString(0,16,(uint8_t*)"Distance:",8,1);
     if (distance >= 0) {
         // 四舍五入到小数点后1位
         float rounded_distance = (float)((int)(distance * 10 + 0.5)) / 10;
-        oled_showFnum(60,20,rounded_distance,8,1);
-        OLED_ShowString(100,20,(uint8_t*)"cm",8,1);
+        oled_showFnum(60,16,rounded_distance,8,1);
+        OLED_ShowString(100,16,(uint8_t*)"cm",8,1);
     } else {
-        OLED_ShowString(60,20,(uint8_t*)"Error",8,1);
+        OLED_ShowString(60,16,(uint8_t*)"Error",8,1);
     }
     
-    OLED_ShowString(0,40,(uint8_t*)"Temp:",8,1);
+    OLED_ShowString(0,32,(uint8_t*)"Temp:",8,1);
     if (temperature != -999.9f) {
         // 四舍五入到小数点后1位
         float rounded_temp = (float)((int)(temperature * 10 + 0.5)) / 10;
-        oled_showFnum(30,40,rounded_temp,8,1);
-        OLED_ShowString(70,40,(uint8_t*)"C",8,1);
+        oled_showFnum(30,32,rounded_temp,8,1);
+        OLED_ShowString(70,32,(uint8_t*)"C",8,1);
     } else {
-        OLED_ShowString(30,40,(uint8_t*)"Error",8,1);
+        OLED_ShowString(30,32,(uint8_t*)"Error",8,1);
     }
+    
+    OLED_ShowString(0,48,(uint8_t*)"Humidity:",8,1);
+    // 四舍五入到小数点后1位
+    float rounded_humidity = (float)((int)(humidity * 10 + 0.5)) / 10;
+    oled_showFnum(60,48,rounded_humidity,8,1);
+    OLED_ShowString(100,48,(uint8_t*)"%",8,1);
     
     OLED_Refresh();
     HAL_Delay(500);
@@ -426,6 +452,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -436,7 +463,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -451,7 +478,13 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV2;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }

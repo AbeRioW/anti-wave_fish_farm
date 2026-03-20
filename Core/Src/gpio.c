@@ -65,16 +65,9 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : OLED_SCL_Pin HC_SR04_Trig_Pin */
-  GPIO_InitStruct.Pin = OLED_SCL_Pin|HC_SR04_Trig_Pin;
+  /*Configure GPIO pins : OLED_SCL_Pin DS1820_Pin HC_SR04_Trig_Pin */
+  GPIO_InitStruct.Pin = OLED_SCL_Pin|DS1820_Pin|HC_SR04_Trig_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-  
-  /*Configure GPIO pin : DS1820_Pin */
-  GPIO_InitStruct.Pin = DS1820_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD; // 开漏输出，支持双向通信
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);

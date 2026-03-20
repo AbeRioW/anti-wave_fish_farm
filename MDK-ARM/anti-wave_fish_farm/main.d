@@ -22,12 +22,15 @@ anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_ex
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h
+anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h
+anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 anti-wave_fish_farm\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
+anti-wave_fish_farm\main.o: ../Core/Inc/adc.h
 anti-wave_fish_farm\main.o: ../Core/Inc/i2c.h
 anti-wave_fish_farm\main.o: ../Core/Inc/tim.h
 anti-wave_fish_farm\main.o: ../Core/Inc/gpio.h
