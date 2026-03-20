@@ -21,9 +21,16 @@ float BH1750_ReadLight(void)
     float temp;
     uint8_t measure_cmd = 0x10;
 
-    HAL_I2C_Master_Transmit(&hi2c1, BH1750_WRITE_ADDR, &measure_cmd, 1, 100);
+    if (HAL_I2C_Master_Transmit(&hi2c1, BH1750_WRITE_ADDR, &measure_cmd, 1, 100) != HAL_OK)
+    {
+        return -1.0f;
+    }
     HAL_Delay(180);
-    HAL_I2C_Master_Receive(&hi2c1, BH1750_READ_ADDR, buf, 2, 100);
+    
+    if (HAL_I2C_Master_Receive(&hi2c1, BH1750_READ_ADDR, buf, 2, 100) != HAL_OK)
+    {
+        return -1.0f;
+    }
 
     dis_data = buf[0];
     dis_data = (dis_data << 8) + buf[1];

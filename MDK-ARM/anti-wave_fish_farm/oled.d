@@ -9,14 +9,14 @@ anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_de
 anti-wave_fish_farm\oled.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h
 anti-wave_fish_farm\oled.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h
 anti-wave_fish_farm\oled.o: ../Drivers/CMSIS/Include/core_cm3.h
-anti-wave_fish_farm\oled.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+anti-wave_fish_farm\oled.o: D:\Program Files\KEIL5\ARM\ARMCC\Bin\..\include\stdint.h
 anti-wave_fish_farm\oled.o: ../Drivers/CMSIS/Include/cmsis_version.h
 anti-wave_fish_farm\oled.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 anti-wave_fish_farm\oled.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 anti-wave_fish_farm\oled.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-anti-wave_fish_farm\oled.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+anti-wave_fish_farm\oled.o: D:\Program Files\KEIL5\ARM\ARMCC\Bin\..\include\stddef.h
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h
@@ -28,6 +28,6 @@ anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_fl
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 anti-wave_fish_farm\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
-anti-wave_fish_farm\oled.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+anti-wave_fish_farm\oled.o: D:\Program Files\KEIL5\ARM\ARMCC\Bin\..\include\stdlib.h
 anti-wave_fish_farm\oled.o: ..\APP\oledfont.h
-anti-wave_fish_farm\oled.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+anti-wave_fish_farm\oled.o: D:\Program Files\KEIL5\ARM\ARMCC\Bin\..\include\stdio.h

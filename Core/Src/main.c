@@ -99,6 +99,7 @@ int main(void)
   while (1)
   {
     float light_value = BH1750_ReadLight();
+    OLED_Clear();
     OLED_ShowString(0,0,(uint8_t*)"Lux:",8,1);
     oled_showFnum(30,0,light_value,8,1);
     OLED_Refresh();
