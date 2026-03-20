@@ -65,6 +65,214 @@ void delay_us(uint32_t us)
     while(delay--);
 }
 
+// DS18B20相关函数
+#define DS18B20_PIN DS1820_Pin
+#define DS18B20_PORT DS1820_GPIO_Port
+
+// 设置DS18B20引脚为输出
+void DS18B20_SetOutput(void)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = DS18B20_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(DS18B20_PORT, &GPIO_InitStruct);
+}
+
+// 设置DS18B20引脚为输入
+void DS18B20_SetInput(void)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = DS18B20_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(DS18B20_PORT, &GPIO_InitStruct);
+}
+
+// 复位DS18B20
+uint8_t DS18B20_Reset(void)
+{
+    uint8_t response = 0;
+    
+    DS18B20_SetOutput();
+    HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, GPIO_PIN_RESET);
+    delay_us(750);
+    HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, GPIO_PIN_SET);
+    delay_us(15);
+    
+    DS18B20_SetInput();
+    response = HAL_GPIO_ReadPin(DS18B20_PORT, DS18B20_PIN);
+    
+    return response;
+}
+
+// 检查DS18B20是否存在
+uint8_t DS18B20_Check(void)
+{
+    uint8_t pulse_time = 0;
+    
+    DS18B20_SetInput();
+    
+    // 等待DS18B20的低脉冲（60-240us）
+    while (HAL_GPIO_ReadPin(DS18B20_PORT, DS18B20_PIN) && pulse_time < 100) {
+        pulse_time++;
+        delay_us(1);
+    }
+    
+    if (pulse_time >= 100) {
+        return 1; // 无响应
+    }
+    
+    pulse_time = 0;
+    
+    // 等待低脉冲结束
+    while (!HAL_GPIO_ReadPin(DS18B20_PORT, DS18B20_PIN) && pulse_time < 240) {
+        pulse_time++;
+        delay_us(1);
+    }
+    
+    if (pulse_time >= 240) {
+        return 1; // 无响应
+    }
+    
+    return 0; // 正常
+}
+
+// 向DS18B20写1位
+void DS18B20_WriteBit(uint8_t bit)
+{
+    DS18B20_SetOutput();
+    
+    if (bit) {
+        // 写1
+        HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, GPIO_PIN_RESET);
+        delay_us(9);
+        HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, GPIO_PIN_SET);
+        delay_us(55);
+    } else {
+        // 写0
+        HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, GPIO_PIN_RESET);
+        delay_us(70);
+        HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, GPIO_PIN_SET);
+        delay_us(2);
+    }
+}
+
+// 向DS18B20写1字节
+void DS18B20_WriteByte(uint8_t byte)
+{
+    uint8_t i;
+    for (i = 0; i < 8; i++) {
+        DS18B20_WriteBit(byte & 0x01);
+        byte >>= 1;
+    }
+}
+
+// 从DS18B20读1位
+uint8_t DS18B20_ReadBit(void)
+{
+    uint8_t bit = 0;
+    
+    DS18B20_SetOutput();
+    HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, GPIO_PIN_RESET);
+    delay_us(10);
+    
+    DS18B20_SetInput();
+    if (HAL_GPIO_ReadPin(DS18B20_PORT, DS18B20_PIN) == GPIO_PIN_SET) {
+        bit = 1;
+    } else {
+        bit = 0;
+    }
+    
+    delay_us(45);
+    return bit;
+}
+
+// 从DS18B20读1字节
+uint8_t DS18B20_ReadByte(void)
+{
+    uint8_t i, byte = 0;
+    for (i = 0; i < 8; i++) {
+        byte >>= 1;
+        if (DS18B20_ReadBit()) {
+            byte |= 0x80;
+        }
+    }
+    return byte;
+}
+
+// 读取DS18B20温度
+float DS18B20_ReadTemperature(void)
+{
+    uint8_t temp_l, temp_h;
+    int16_t temp_raw;
+    float temp = -999.9f;
+    
+    // 复位
+    DS18B20_Reset();
+    if (DS18B20_Check()) {
+        return -999.9f; // 错误
+    }
+    
+    // 跳过ROM
+    DS18B20_WriteByte(0xCC);
+    
+    // 转换温度
+    DS18B20_WriteByte(0x44);
+    
+    // 等待转换完成（最长800ms，12位分辨率）
+    HAL_Delay(800); // 使用固定延时，更可靠
+    
+    // 复位
+    DS18B20_Reset();
+    if (DS18B20_Check()) {
+        return -999.9f; // 错误
+    }
+    
+    // 跳过ROM
+    DS18B20_WriteByte(0xCC);
+    
+    // 读温度
+    DS18B20_WriteByte(0xBE);
+    
+    // 读取温度低字节
+    temp_l = DS18B20_ReadByte();
+    
+    // 读取温度高字节
+    temp_h = DS18B20_ReadByte();
+    
+    // 组合温度数据
+    temp_raw = (int16_t)((temp_h << 8) | temp_l);
+    
+    // 计算温度
+    if (temp_raw < 0) {
+        // 负温度
+        temp = (float)(~temp_raw + 1) * 0.0625f;
+    } else {
+        // 正温度
+        temp = (float)temp_raw * 0.0625f;
+    }
+    
+    // 验证温度范围（DS18B20的有效范围：-55℃ to +125℃）
+    if (temp < -55.0f || temp > 125.0f) {
+        return -999.9f; // 错误
+    }
+    
+    return temp;
+}
+
+// 初始化DS18B20
+void DS18B20_Init(void)
+{
+    // 设置为输出模式
+    DS18B20_SetOutput();
+    HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, GPIO_PIN_SET);
+    
+    // 复位测试
+    DS18B20_Reset();
+}
+
 // HC-SR04超声波测距函数（使用GPIO轮询 + 简单计数）
 float HCSR04_MeasureDistance(void)
 {
@@ -160,6 +368,7 @@ int main(void)
   OLED_Init();
   BH1750_Init();
   HCSR04_Init();
+  DS18B20_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -171,6 +380,9 @@ int main(void)
     
     // 读取超声波距离
     float distance = HCSR04_MeasureDistance();
+    
+    // 读取温度数据
+    float temperature = DS18B20_ReadTemperature();
     
     // 显示数据
     OLED_Clear();
@@ -185,6 +397,16 @@ int main(void)
         OLED_ShowString(100,20,(uint8_t*)"cm",8,1);
     } else {
         OLED_ShowString(60,20,(uint8_t*)"Error",8,1);
+    }
+    
+    OLED_ShowString(0,40,(uint8_t*)"Temp:",8,1);
+    if (temperature != -999.9f) {
+        // 四舍五入到小数点后1位
+        float rounded_temp = (float)((int)(temperature * 10 + 0.5)) / 10;
+        oled_showFnum(30,40,rounded_temp,8,1);
+        OLED_ShowString(70,40,(uint8_t*)"C",8,1);
+    } else {
+        OLED_ShowString(30,40,(uint8_t*)"Error",8,1);
     }
     
     OLED_Refresh();
